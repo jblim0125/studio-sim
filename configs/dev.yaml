@@ -1,0 +1,28 @@
+log:
+  output: "stdout" # stdout, file
+  level: "debug" # debug, info, warn, error
+  # savePath: "log path( logs )"
+  # sizePerFileMb: "max size of log file( ex : 100 )"
+  # maxOfDay: "max number of log file in 1 day( ex : 100 )"
+  # maxAge: "max age( ex : 7 )"
+  # compress: "compress(true/false)"
+server:
+  # cache server info
+  ip : "192.168.102.114"
+  port : 8080
+sendRule:
+  # 암호화된 DSL 전송?
+  encrypt: false
+  # Thread 수 ( 한번에 전송하는 DSL의 수 )
+  numThread: 1
+  # Thread 동작 간격( DSL-1, DSL-2의 전송 간격, 단위 : ms )
+  period: 5000
+  # DSL 전송 수( 동일한 DSL을 설정된 수 만큼 전송 )
+  numSend: 1
+  # DSL 전송 간격( 동일한 DSL의 전송하는 간격, 단위 : ms )
+  periodDSL: 100
+  # 전체 DSL 전송 후 다시 시작
+  infinite: true
+
+
+

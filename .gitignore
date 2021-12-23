@@ -1,0 +1,5 @@
+### Binaries ###
+.idea/
+/build/
+/.cache/
+/bin/
