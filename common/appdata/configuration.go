@@ -66,12 +66,13 @@ type ServerConfiguration struct {
 
 // DSLSendRule DSL 전송 룰
 type DSLSendRule struct {
-	Encrypt   bool `yaml:"encrypt" json:"encrypt"`
-	NumThread int  `yaml:"numThread" json:"numThread"`
-	Period    int  `yaml:"period" json:"period"`
-	NumSend   int  `yaml:"numSend" json:"numSend"`
-	PeriodDSL int  `yaml:"periodDSL" json:"periodDSL"`
-	Infinite  bool `yaml:"infinite" json:"infinite"`
+	Encrypt    bool `yaml:"encrypt" json:"encrypt"`
+	NumThread  int  `yaml:"numThread" json:"numThread"`
+	Period     int  `yaml:"period" json:"period"`
+	NumSend    int  `yaml:"numSend" json:"numSend"`
+	PeriodDSL  int  `yaml:"periodDSL" json:"periodDSL"`
+	Infinite   bool `yaml:"infinite" json:"infinite"`
+	RunningDSL int  `yaml:"runningDSL" json:"runningDSL"`
 }
 
 // Print 환경 설정 주어진 io.writer로 출력

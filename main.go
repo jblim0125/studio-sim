@@ -91,17 +91,17 @@ func Initialize() (*Context, error) {
 		return nil, err
 	}
 
-	dsls, err := dsl.ReadSampleDSL("./sample/dsl.json")
+	dsls, err := dsl.ReadSampleDSL("./sample/iris_platform.json")
 	if err != nil {
 		return nil, err
 	}
 	c.DSLs = dsls
 
-	//auth, err := Auth{}.Initialize(c.Conf.Server.IP, c.Conf.Server.Port)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//c.Auth = auth
+	auth, err := internal.Auth{}.Initialize(c.Conf.Server.IP, c.Conf.Server.Port)
+	if err != nil {
+		return nil, err
+	}
+	c.Auth = auth
 
 	dslSender := worker.DSLSender{}.NewDSLSender(c.Log, c.Auth, c.DSLs, c.Conf)
 	c.DSLSender = dslSender
@@ -122,7 +122,7 @@ func (c *Context) StartSubModules() {
 
 	// TODO : Start Other Sub Modules
 	for id := 0; id < c.Conf.SendRule.NumThread; id++ {
-		go c.DSLSender.Run(id, c.SIDSender.Dsl[id])
+		go c.DSLSender.Run(id, c.SIDSender.DslChannel[id])
 		go c.SIDSender.RunSIDReceiver(id)
 		go c.SIDSender.RunSIDSender(id)
 	}
@@ -150,7 +150,10 @@ func (c *Context) StartSubModules() {
 // StopSubModules Stop Submodules
 func (c *Context) StopSubModules() {
 	//integration.JhmsClient{}.Destroy()
-	//c.Log.Errorf("[ JHMS Client ] Shutdown .......................................................... [ OK ]")
+	c.DSLSender.Destroy()
+	c.Log.Errorf("[ DSL goRoutine ] Shutdown ........................................................ [ OK ]")
+	c.SIDSender.Destroy()
+	c.Log.Errorf("[ SID goRoutine ] Shutdown ........................................................ [ OK ]")
 }
 
 // @title Cache Server API

@@ -3,3 +3,6 @@
 /build/
 /.cache/
 /bin/
+/build___run.exe
+/install.sh
+/install_binary.sh

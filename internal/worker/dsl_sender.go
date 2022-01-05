@@ -3,6 +3,7 @@ package worker
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/jblim0125/studio-sim/common"
 	"github.com/jblim0125/studio-sim/common/appdata"
 	"github.com/jblim0125/studio-sim/internal"
@@ -20,6 +21,7 @@ type DSLSender struct {
 	Auth *internal.Auth
 	Dsls *map[string]interface{}
 	Conf *appdata.Configuration
+	STOP bool
 }
 
 // DslURL DSL Request 요청 URL
@@ -33,6 +35,7 @@ func (DSLSender) NewDSLSender(log *common.Logger, auth *internal.Auth,
 		Auth: auth,
 		Dsls: dsls,
 		Conf: conf,
+		STOP: false,
 	}
 }
 
@@ -45,33 +48,43 @@ func (dslSender *DSLSender) Run(id int, ch chan models.HTTPData) {
 	next = (now + remain)
 
 	dslSender.log.Errorf("[ DSL Sender[ %d ] Start ........................................................... [ OK ]", id)
-	//url := fmt.Sprintf(DslURL, dslSender.Conf.Server.IP, dslSender.Conf.Server.Port)
-DslSend:
-	for k, v := range *dslSender.Dsls {
-		now = util.GetMillis()
-		if now >= next {
-			for i := 0; i < dslSender.Conf.SendRule.NumSend; i++ {
-				go func() {
-					//err := dslSender.SendDSL(url, k, v, ch)
-					err := dslSender.TestSendDSL(k, v, ch)
-					if err != nil {
-						dslSender.log.Errorf("Send DSL Err[ %s ]", err.Error())
-					}
-				}()
-				time.Sleep(time.Duration(dslSender.Conf.SendRule.PeriodDSL) * time.Millisecond)
-			}
-			// Calc Next Runtime
+	url := fmt.Sprintf(DslURL, dslSender.Conf.Server.IP, dslSender.Conf.Server.Port)
+	for {
+		for k, v := range *dslSender.Dsls {
 			now = util.GetMillis()
-			remain = period - (now % period)
-			next = (now + remain)
+			if now >= next {
+				for i := 0; i < dslSender.Conf.SendRule.NumSend; i++ {
+					dslSender.WaitTotalDSLLimit()
+					go func() {
+						err := dslSender.SendDSL(url, k, v, ch)
+						//err := dslSender.TestSendDSL(k, v, ch)
+						if err != nil {
+							dslSender.log.Errorf("Send DSL Err[ %s ]", err.Error())
+						} else {
+							RunningDSL{}.IncDSL()
+						}
+					}()
+					time.Sleep(time.Duration(dslSender.Conf.SendRule.PeriodDSL) * time.Millisecond)
+				}
+				// Calc Next Runtime
+				now = util.GetMillis()
+				remain = period - (now % period)
+				next = (now + remain)
+			}
+			// Sleep
+			time.Sleep(20 * time.Millisecond)
+			if dslSender.STOP {
+				break
+			}
 		}
-		// Sleep
-		time.Sleep(20 * time.Millisecond)
+		if dslSender.STOP {
+			break
+		}
+		if !dslSender.Conf.SendRule.Infinite {
+			break
+		}
 	}
-	if dslSender.Conf.SendRule.Infinite {
-		goto DslSend
-	}
-	dslSender.log.Errorf("[ DSL Sender[ %d ] Finish ........................................................ [ OK ]", id)
+	dslSender.log.Errorf("[ DSL Sender[ %d ] Finish .......................................................... [ OK ]", id)
 }
 
 // SendDSL DSL 전송
@@ -90,8 +103,6 @@ func (dslSender *DSLSender) SendDSL(url, k string, v interface{}, ch chan models
 		stat.SimStat{}.SendDSLErr()
 		return err
 	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Angora "+token)
 
 	if dslSender.Conf.SendRule.Encrypt {
 		q := []string{}
@@ -128,12 +139,15 @@ func (dslSender *DSLSender) SendDSL(url, k string, v interface{}, ch chan models
 		stat.SimStat{}.SendDSLErr()
 		return nil
 	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Angora "+token)
 	resp, err := client.Do(req)
 	if err != nil {
 		stat.SimStat{}.SendDSLErr()
 		return nil
 	}
 	stat.SimStat{}.SendDSL()
+	dslSender.log.Debugf("[ SIM >> SERVER ] DSL Request")
 
 	ch <- models.HTTPData{
 		Response: resp,
@@ -161,4 +175,21 @@ func (dslSender *DSLSender) TestSendDSL(k string, v interface{}, ch chan models.
 	}
 	return nil
 
+}
+
+// Destroy DSL 전송 스레드들 종료
+func (dslSender *DSLSender) Destroy() {
+	dslSender.STOP = true
+}
+
+// WaitTotalDSLLimit 현재 진행형 상태의 DSL 수를 제한두기 위함.
+func (dslSender *DSLSender) WaitTotalDSLLimit() {
+	now := int32(dslSender.Conf.SendRule.RunningDSL)
+	for {
+		cnt := RunningDSL{}.GetDSL()
+		if cnt < now {
+			return
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
 }

@@ -47,7 +47,7 @@ func (Auth) Initialize(ip string, port int) (*Auth, error) {
 
 // GetAuthToken get auth token
 func (a *Auth) GetAuthToken() (string, error) {
-	if a.ExpireTime+(1000*60*5) >= util.GetMillis() {
+	if a.ExpireTime+(1000*60*5) <= util.GetMillis() {
 		if err := a.sendAuthRequest(); err != nil {
 			return "", fmt.Errorf("failed to refresh aut token[ %s ]", err.Error())
 		}

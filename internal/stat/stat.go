@@ -64,12 +64,12 @@ func (SimStat) RecvData() {
 	atomic.AddInt32(&stat.recvData, 1)
 }
 
-// ErrDSL DSL 전송 후 에러 발생
+// ErrDSL DSL 요청 후 에러 수신 or 수신 과정에서 에러 발생
 func (SimStat) ErrDSL() {
 	atomic.AddInt32(&stat.errInDSL, 1)
 }
 
-// ErrSID sid 전송 후 에러 발생
+// ErrSID SID 요청 후 에러 수신 or 수신 과정에서 에러 발생
 func (SimStat) ErrSID() {
 	atomic.AddInt32(&stat.errInSID, 1)
 }

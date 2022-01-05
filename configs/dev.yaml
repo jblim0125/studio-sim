@@ -8,7 +8,9 @@ log:
   # compress: "compress(true/false)"
 server:
   # cache server info
-  ip : "192.168.102.114"
+  #ip : "192.168.102.114"
+  ip : "localhost"
+  #port : 32594
   port : 8080
 sendRule:
   # 암호화된 DSL 전송?
@@ -23,6 +25,5 @@ sendRule:
   periodDSL: 100
   # 전체 DSL 전송 후 다시 시작
   infinite: true
-
-
-
+  # 실행 중 DSL 수, 서버에 데이터를 요청하고 있는 상태의 수
+  runningDSL: 1
