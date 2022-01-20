@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"reflect"
+	"time"
+
 	"github.com/jblim0125/studio-sim/common"
 	"github.com/jblim0125/studio-sim/common/appdata"
 	"github.com/jblim0125/studio-sim/internal"
 	"github.com/jblim0125/studio-sim/internal/stat"
 	"github.com/jblim0125/studio-sim/models"
 	"github.com/jblim0125/studio-sim/tools/util"
-	"net/http"
-	"reflect"
-	"time"
 )
 
 // DSLSender DSL 전송 객체
@@ -51,28 +52,38 @@ func (dslSender *DSLSender) Run(id int, ch chan models.HTTPData) {
 	url := fmt.Sprintf(DslURL, dslSender.Conf.Server.IP, dslSender.Conf.Server.Port)
 	for {
 		for k, v := range *dslSender.Dsls {
-			now = util.GetMillis()
-			if now >= next {
-				for i := 0; i < dslSender.Conf.SendRule.NumSend; i++ {
-					dslSender.WaitTotalDSLLimit()
-					go func() {
-						err := dslSender.SendDSL(url, k, v, ch)
-						//err := dslSender.TestSendDSL(k, v, ch)
-						if err != nil {
-							dslSender.log.Errorf("Send DSL Err[ %s ]", err.Error())
-						} else {
-							RunningDSL{}.IncDSL()
-						}
-					}()
-					time.Sleep(time.Duration(dslSender.Conf.SendRule.PeriodDSL) * time.Millisecond)
-				}
-				// Calc Next Runtime
+			dslSender.log.Debugf("DSL Idx[ %s ] Will Send.", k)
+			for {
 				now = util.GetMillis()
-				remain = period - (now % period)
-				next = (now + remain)
+				if now >= next {
+					for i := 0; i < dslSender.Conf.SendRule.NumSend; i++ {
+						dslSender.WaitTotalDSLLimit()
+						go func() {
+							err := dslSender.SendDSL(url, k, v, ch)
+							//err := dslSender.TestSendDSL(k, v, ch)
+							if err != nil {
+								dslSender.log.Errorf("Send DSL Err[ %s ]", err.Error())
+							} else {
+								RunningDSL{}.IncDSL()
+							}
+						}()
+						time.Sleep(time.Duration(dslSender.Conf.SendRule.PeriodDSL) * time.Millisecond)
+						if dslSender.STOP {
+							break
+						}
+					}
+					// Calc Next Runtime
+					now = util.GetMillis()
+					remain = period - (now % period)
+					next = (now + remain)
+					break
+				}
+				// Sleep
+				time.Sleep(20 * time.Millisecond)
+				if dslSender.STOP {
+					break
+				}
 			}
-			// Sleep
-			time.Sleep(20 * time.Millisecond)
 			if dslSender.STOP {
 				break
 			}

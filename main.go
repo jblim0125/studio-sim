@@ -2,10 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/jblim0125/studio-sim/internal"
-	"github.com/jblim0125/studio-sim/internal/dsl"
-	"github.com/jblim0125/studio-sim/internal/stat"
-	"github.com/jblim0125/studio-sim/internal/worker"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,6 +9,11 @@ import (
 
 	"github.com/jblim0125/studio-sim/common"
 	"github.com/jblim0125/studio-sim/common/appdata"
+	"github.com/jblim0125/studio-sim/internal"
+	"github.com/jblim0125/studio-sim/internal/dsl"
+	"github.com/jblim0125/studio-sim/internal/stat"
+	"github.com/jblim0125/studio-sim/internal/worker"
+
 	"github.com/sirupsen/logrus"
 )
 
