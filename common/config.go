@@ -2,18 +2,17 @@ package common
 
 import (
 	"github.com/fsnotify/fsnotify"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 // ConfigManager config manager
 type ConfigManager struct {
 	Viper *viper.Viper
-	Log   *logrus.Logger
+	Log   *Logger
 }
 
 // New create config manager
-func (ConfigManager) New(log *logrus.Logger) *ConfigManager {
+func (ConfigManager) New(log *Logger) *ConfigManager {
 	return &ConfigManager{
 		Viper: viper.New(),
 		Log:   log,

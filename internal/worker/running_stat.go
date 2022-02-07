@@ -2,29 +2,30 @@ package worker
 
 import "sync/atomic"
 
-type RunningDSL struct {
+// RunningLimit running DSL count for limit
+type RunningLimit struct {
 	Count int32
 }
 
-var _running *RunningDSL
+var _running *RunningLimit
 
 func init() {
-	_running = &RunningDSL{
+	_running = &RunningLimit{
 		Count: 0,
 	}
 }
 
 // IncDSL 실행 중인 DSL 수 +1
-func (RunningDSL) IncDSL() {
+func (RunningLimit) IncDSL() {
 	atomic.AddInt32(&_running.Count, 1)
 }
 
 // DecDSL 실행 중인 DSL 수 -1
-func (RunningDSL) DecDSL() {
+func (RunningLimit) DecDSL() {
 	atomic.AddInt32(&_running.Count, -1)
 }
 
-// GetDSL 실행 중인 DSL 수
-func (RunningDSL) GetDSL() int32 {
+// GetRunningCnt 실행 중인 DSL 수
+func (RunningLimit) GetRunningCnt() int32 {
 	return atomic.LoadInt32(&_running.Count)
 }

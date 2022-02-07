@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/jblim0125/studio-sim/models"
-	"github.com/jblim0125/studio-sim/tools/util"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/jblim0125/cache-sim/models"
+	"github.com/jblim0125/cache-sim/tools/util"
 )
 
 /*

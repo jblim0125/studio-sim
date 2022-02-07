@@ -7,7 +7,7 @@
 # program name and version info 
 TARGET := cache-sim
 VERSION := v0.1.0
-IMAGE ?= repo.iris.tools/iris/$(TARGET):$(VERSION)
+IMAGE ?= repo.iris.tools/irisdev/$(TARGET):$(VERSION)
 
 ################################################################################
 

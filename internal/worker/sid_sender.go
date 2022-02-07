@@ -3,13 +3,14 @@ package worker
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/jblim0125/studio-sim/common"
-	"github.com/jblim0125/studio-sim/common/appdata"
-	"github.com/jblim0125/studio-sim/internal"
-	"github.com/jblim0125/studio-sim/internal/stat"
-	"github.com/jblim0125/studio-sim/models"
 	"io"
 	"net/http"
+
+	"github.com/jblim0125/cache-sim/common"
+	"github.com/jblim0125/cache-sim/common/appdata"
+	"github.com/jblim0125/cache-sim/internal"
+	"github.com/jblim0125/cache-sim/internal/stat"
+	"github.com/jblim0125/cache-sim/models"
 )
 
 // SIDSender SID 전송 객체
@@ -53,7 +54,7 @@ func (sidSender *SIDSender) RunSIDReceiver(id int) {
 			err := sidSender.ReadDSLResponse(id, resp)
 			if err != nil {
 				sidSender.log.Errorf("SID Receive Err[ %s ]", err.Error())
-				RunningDSL{}.DecDSL()
+				RunningLimit{}.DecDSL()
 			}
 		}
 		if sidSender.STOP {
@@ -99,7 +100,7 @@ func (sidSender *SIDSender) RunSIDSender(id int) {
 				if err != nil {
 					sidSender.log.Errorf("Send SID Err[ %s ]", err.Error())
 				}
-				RunningDSL{}.DecDSL()
+				RunningLimit{}.DecDSL()
 			}()
 		}
 		if sidSender.STOP {
@@ -201,7 +202,7 @@ func (sidSender *SIDSender) SendClose() {
 	var req *http.Request
 	var res *http.Response
 
-	for k, _ := range sidSender.RunningSID {
+	for k := range sidSender.RunningSID {
 
 		url := fmt.Sprintf(SIDURL, sidSender.Conf.Server.IP, sidSender.Conf.Server.Port, k)
 		req, err = http.NewRequest(http.MethodDelete, url, nil)

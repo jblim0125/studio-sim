@@ -14,5 +14,7 @@ type DSLEncryptRequest struct {
 
 // DSLResponseBody angora/query/job, angora/v2/query/job response body
 type DSLResponseBody struct {
-	SID string `json:"sid"`
+	SID     string `json:"sid,omitempty"`
+	Code    string `json:"code,omitempty"`
+	Message string `json:"message,omitempty"`
 }

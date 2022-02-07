@@ -6,9 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jblim0125/studio-sim/common/appdata"
 	formatter "github.com/mobigen/gologger"
 	"github.com/sirupsen/logrus"
+
+	"github.com/jblim0125/cache-sim/common/appdata"
 )
 
 // Logger struct have embedding logrus.Logger

@@ -1,0 +1,6 @@
+{
+  "DSLs":
+  {
+    "model name = 'EPS_BID_WINNER' model_owner = root start_date = 20200101000000 end_date = 20211222235959 | where bidprcCorpNm is not null | where dmndInsttNm = '인천광역시' | where bidprcCorpNm in ('주식회사 도화엔지니어링','주식회사케이티','쌍용정보통신(주)','주식회사 엘지씨엔에스','네이버비즈니스플랫폼 주식회사','대신정보통신 주식회사','주식회사 건화','주식회사 한국종합기술','주식회사 삼안','주식회사 동명기술공단종합건축사사무소') | fields bidprcCorpNm as 낙찰업체, PRESMPTPRCE as 추정가격1, BIDPRCAMT as 낙찰금액, opengRank as 개찰순위, sucsfYn as 낙찰여부1 | sql \"select *, case when `개찰순위` = '1' then 'Y' else `낙찰여부1` end `낙찰여부` from angora\" | where 낙찰여부 ='Y' | calculate 추정가격1*1.1 as 추정가격 | calculate (낙찰금액/추정가격)*100 as `낙찰률(%)` | where `낙찰률(%)` is not null | where `낙찰률(%)`> 0 and `낙찰률(%)`<=100":["f8tG4l4MgTFW8FqkcteqyeApVLPpKXtXLpmxXwSw7ueZ9M3TGm8LjvlfxKD0PDVQkbWtN1+SQ+wRk7rVpHnbaKeRxG887f2Ovw2y5+GVj3kcO5pguIqeoayi/udDnDsCizQvdbJS9U344Ioi6TtAaw5w+9X5xPL8a7cvWV5q2dA="]
+  }
+}
