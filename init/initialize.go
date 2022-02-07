@@ -34,14 +34,6 @@ func (Context) New(log *common.Logger, config *appdata.Configuration) *Context {
 	}
 }
 
-// SetLogger set log level, log output. and etc
-func (c *Context) SetLogger() error {
-	if err := c.Log.Setting(&c.Conf.Log); err != nil {
-		return err
-	}
-	return nil
-}
-
 // Initialize simulator application initialize
 func (c *Context) Initialize(dslPath string) error {
 	dsls, err := dsl.ReadSampleDSL(dslPath)

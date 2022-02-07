@@ -71,18 +71,18 @@ func (SimStat) ErrSID() {
 
 // Print 수집된 통계 출력
 func (SimStat) Print(log *logrus.Logger) {
-	log.Errorf("--------------------- Send ----------------------")
-	log.Errorf("   DSL   |   Err   |   SID   |   Err   |")
+	log.Errorf("--------------------- DSL ----------------------")
+	log.Errorf("|%9s|%9s|%9s|%9s|", "Send", "SndErr", "Success", "Error")
 	log.Errorf("%9d|%9d|%9d|%9d|",
 		atomic.LoadInt32(&stat.sendDSL),
 		atomic.LoadInt32(&stat.sendDSLErr),
-		atomic.LoadInt32(&stat.sendSID),
-		atomic.LoadInt32(&stat.sendSIDErr))
-	log.Errorf("--------------------- Recv -----------------------")
-	log.Errorf("   SID   |   Err   |   Data  |   Err   |")
-	log.Errorf("%9d|%9d|%9d|%9d|",
 		atomic.LoadInt32(&stat.recvSID),
-		atomic.LoadInt32(&stat.errInDSL),
+		atomic.LoadInt32(&stat.errInDSL))
+	log.Errorf("--------------------- SID -----------------------")
+	log.Errorf("|%9s|%9s|%9s|%9s|", "Send", "SndErr", "Success", "Error")
+	log.Errorf("%9d|%9d|%9d|%9d|",
+		atomic.LoadInt32(&stat.sendSID),
+		atomic.LoadInt32(&stat.sendSIDErr),
 		atomic.LoadInt32(&stat.recvData),
 		atomic.LoadInt32(&stat.errInSID))
 }

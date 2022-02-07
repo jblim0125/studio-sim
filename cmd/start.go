@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	startCmd.PersistentFlags().StringP("log", "l", "debug", "application log level(debug, info, warn, error)")
+	startCmd.PersistentFlags().StringP("log", "l", "", "application log level(debug, info, warn, error)")
 	startCmd.PersistentFlags().String("config", "./configs/dev.yaml", "path of configuration file")
 	startCmd.PersistentFlags().String("dsl", "./dsl_sample/dsl_sample.json", "path of dsl file")
 }
@@ -28,10 +28,7 @@ var startCmd = &cobra.Command{
 		if err != nil {
 			return errors.Wrap(err, "can't get log level from input")
 		}
-		log, err := initLog(logLevel)
-		if err != nil {
-			return err
-		}
+		log := initLog()
 		configPath, err := cmd.Flags().GetString("config")
 		if err != nil {
 			return errors.Wrap(err, "can't get path of config file")
@@ -40,10 +37,8 @@ var startCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		setLogLevel(logLevel, &config.Log)
 		appContext := appInit.Context{}.New(log, config)
-		if err := appContext.SetLogger(); err != nil {
-			return err
-		}
 		dslPath, err := cmd.Flags().GetString("dsl")
 		if err != nil {
 			return errors.Wrap(err, "can't get path of config file")
@@ -51,19 +46,16 @@ var startCmd = &cobra.Command{
 		if err := appContext.Initialize(dslPath); err != nil {
 			return err
 		}
+		appContext.StartSubModules()
+		log.Shutdown()
 		return nil
 	},
 }
 
-func initLog(level string) (*common.Logger, error) {
+func initLog() *common.Logger {
 	log := common.Logger{}.GetInstance()
-	lv, err := logrus.ParseLevel(level)
-	if err != nil {
-		return nil, errors.Wrap(err, "init log(get log level)")
-	}
-	log.SetLogLevel(lv)
 	log.Start()
-	return log, nil
+	return log
 }
 
 func readConfig(path string) (*appdata.Configuration, error) {
@@ -83,4 +75,15 @@ func readConfig(path string) (*appdata.Configuration, error) {
 	conf.Print(log.Out)
 	log.Errorf("[ Configuration ] Read ............................................................ [ OK ]")
 	return conf, nil
+}
+
+func setLogLevel(input string, conf *appdata.LogConfiguration) {
+	log := common.Logger{}.GetInstance()
+	if len(input) > 0 {
+		_, err := logrus.ParseLevel(input)
+		if err == nil {
+			conf.Level = input
+		}
+	}
+	log.Setting(conf)
 }

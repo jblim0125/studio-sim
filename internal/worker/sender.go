@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"reflect"
 	"time"
@@ -19,11 +20,12 @@ import (
 
 // Sender DSL, SID 을 담당하는 객체
 type Sender struct {
-	log  *common.Logger
-	auth *internal.Auth
-	dsls *map[string]interface{}
-	conf *appdata.Configuration
-	stop bool
+	log        *common.Logger
+	auth       *internal.Auth
+	dsls       *map[string]interface{}
+	conf       *appdata.Configuration
+	runningSID map[string]int
+	stop       bool
 }
 
 // URL base define
@@ -37,11 +39,12 @@ const (
 func (Sender) NewSender(log *common.Logger, auth *internal.Auth,
 	dsls *map[string]interface{}, conf *appdata.Configuration) *Sender {
 	return &Sender{
-		log:  log,
-		auth: auth,
-		dsls: dsls,
-		conf: conf,
-		stop: false,
+		log:        log,
+		auth:       auth,
+		dsls:       dsls,
+		conf:       conf,
+		stop:       false,
+		runningSID: make(map[string]int),
 	}
 }
 
@@ -65,9 +68,23 @@ func (sender *Sender) Run(id int) {
 func (sender *Sender) DSLLoop(id int) {
 	dslIdx := 1
 	for k, v := range *sender.dsls {
-		select {
-		case <-time.After(time.Duration(sender.conf.SendRule.Period) * time.Millisecond):
-			if sender.conf.SendRule.NumThread > 1 {
+		if dslIdx == 1 {
+			if dslIdx%sender.conf.SendRule.NumThread == id {
+				sender.log.Debugf("ID[ %02d ] Send[ %02d ] DSL[ %s ]",
+					id, sender.conf.SendRule.NumSend, k)
+				for i := 0; i < sender.conf.SendRule.NumSend; i++ {
+					// 보내기 전에 설정된 최대 DSL 수를 확인
+					sender.WaitTotalDSLLimit()
+					go sender.RunOneCycle(k, v)
+					time.Sleep(time.Duration(sender.conf.SendRule.PeriodDSL) * time.Millisecond)
+					if sender.stop {
+						break
+					}
+				}
+			}
+		} else {
+			select {
+			case <-time.After(time.Duration(sender.conf.SendRule.Period) * time.Millisecond):
 				if dslIdx%sender.conf.SendRule.NumThread == id {
 					sender.log.Debugf("ID[ %02d ] Send[ %02d ] DSL[ %s ]",
 						id, sender.conf.SendRule.NumSend, k)
@@ -82,8 +99,8 @@ func (sender *Sender) DSLLoop(id int) {
 					}
 				}
 			}
-			dslIdx++
 		}
+		dslIdx++
 		if sender.stop {
 			break
 		}
@@ -101,11 +118,15 @@ func (sender *Sender) RunOneCycle(k string, v interface{}) {
 		stat.SimStat{}.SendDSLErr()
 		return
 	}
-	_, err = sender.GetSID(token, k, v)
+	sid, err := sender.GetSID(token, k, v)
 	if err != nil {
+		sender.log.Errorf("Fail Get SID [ %s ]", err.Error())
 		return
 	}
-	sender.log.Debugf("[ SIM << SERVER ] Receive SID")
+	if err := sender.GetData(token, sid); err != nil {
+		sender.log.Errorf("Fail Get Data [ %s ]", err.Error())
+		return
+	}
 }
 
 // GetSID Send DSL And Receive SID
@@ -125,29 +146,38 @@ func (sender *Sender) GetSID(token, k string, v interface{}) (string, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Angora "+token)
 
+	// Send
+	stat.SimStat{}.SendDSL()
+	sender.log.Info("[ SIM >> SERVER ] DSL Request")
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		stat.SimStat{}.SendDSLErr()
 		return "", errors.Wrap(err, "Fail Send HTTP Request For DSL")
 	}
-	stat.SimStat{}.SendDSL()
-	sender.log.Debugf("[ SIM >> SERVER ] DSL Request")
 
+	sender.log.Info("[ SIM << SERVER ] DSL Response")
 	defer resp.Body.Close()
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		stat.SimStat{}.ErrDSL()
+		return "", errors.Wrap(err, "Failed To Get DSL Response Msg")
+	}
+	sender.log.Debugf("DSL Response: %s", resBody)
+
 	switch resp.StatusCode {
 	case http.StatusOK:
-		res := models.DSLResponseBody{}
-		decoder := json.NewDecoder(resp.Body)
-		err = decoder.Decode(&res)
+		res := models.ResponseBody{}
+		err = json.Unmarshal(resBody, &res)
 		if err != nil {
 			stat.SimStat{}.ErrDSL()
-			return "", errors.Wrap(err, "Failed To Decode DSL Response Msg")
+			return "", errors.Wrap(err, "Failed To Unmarshal DSL Response Msg")
 		}
 		if len(res.SID) <= 0 {
-			sender.log.Debugf("Response Code[ %s ]", res.Code)
+			stat.SimStat{}.ErrDSL()
 			return "", fmt.Errorf("Receive ErrCode?[ %s ]", res.Code)
 		}
+		sender.log.Info("[ SIM << SERVER ] Receive SID")
 		stat.SimStat{}.RecvSID()
 		return res.SID, nil
 	default:
@@ -195,6 +225,96 @@ func (sender *Sender) CrtDSLBody(k string, v interface{}) ([]byte, error) {
 	}
 	return body, nil
 }
+
+// GetData SID 를 이용해 데이터 요청
+func (sender *Sender) GetData(token, sid string) error {
+	client := http.Client{}
+	var req *http.Request
+	var err error
+
+	url := fmt.Sprintf(SIDURL, sender.conf.Server.IP, sender.conf.Server.Port, sid)
+	req, err = http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		stat.SimStat{}.SendSIDErr()
+		return errors.Wrap(err, "failed to create http request for sid request")
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Angora "+token)
+
+	sender.log.Info("[ SIM >> SERVER ] SID Request")
+	stat.SimStat{}.SendSID()
+	sender.runningSID[sid] = 1
+	defer delete(sender.runningSID, sid)
+	resp, err := client.Do(req)
+	if err != nil {
+		stat.SimStat{}.SendSIDErr()
+		return errors.Wrap(err, "failed to send sid request")
+	}
+	sender.log.Info("[ SIM << SERVER ] SID Response")
+	defer resp.Body.Close()
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		stat.SimStat{}.ErrSID()
+		return errors.Wrap(err, "failed to read sid response")
+	}
+	sender.log.Debugf("SID Response: %s", resBody)
+
+	switch resp.StatusCode {
+	case http.StatusOK:
+		res := models.ResponseBody{}
+		err = json.Unmarshal(resBody, &res)
+		if err != nil {
+			stat.SimStat{}.ErrSID()
+			return errors.Wrap(err, "Failed To Unmarshal SID Response Msg")
+		}
+		if len(res.Code) > 0 || len(res.Message) > 0 {
+			stat.SimStat{}.ErrSID()
+			return fmt.Errorf("Receive ErrCode?[ %s ] IN SID", res.Code)
+		}
+		sender.log.Info("[ SIM << SERVER ] Receive Data")
+		stat.SimStat{}.RecvData()
+		return nil
+	default:
+		stat.SimStat{}.ErrSID()
+		return fmt.Errorf("fail DSL request with status code[ %d ]", resp.StatusCode)
+	}
+}
+
+//// SendClose send sid close
+//func (sidSender *SIDSender) SendClose() {
+//    var token string
+//    var err error
+//
+//    // Get Header
+//    token, err = sidSender.Auth.GetAuthToken()
+//    if err != nil {
+//        sidSender.log.Errorf("Fail Get Auth Token In Send DSL[ %s ]", err.Error())
+//        return
+//    }
+//
+//    client := http.Client{}
+//    var req *http.Request
+//    var res *http.Response
+//
+//    for k := range sidSender.RunningSID {
+//
+//        url := fmt.Sprintf(SIDURL, sidSender.Conf.Server.IP, sidSender.Conf.Server.Port, k)
+//        req, err = http.NewRequest(http.MethodDelete, url, nil)
+//        if err != nil {
+//            sidSender.log.Errorf("Failed To Create Http.Request[ %s ]", err.Error())
+//            return
+//        }
+//        req.Header.Set("Content-Type", "application/json")
+//        req.Header.Set("Authorization", "Angora "+token)
+//
+//        res, err = client.Do(req)
+//        if err != nil {
+//            sidSender.log.Errorf("Failed To Request JOB CLOSE[ %s ]", err.Error())
+//            return
+//        }
+//        res.Body.Close()
+//    }
+//}
 
 // WaitTotalDSLLimit 현재 진행형 상태의 DSL 수를 제한두기 위함.
 func (sender *Sender) WaitTotalDSLLimit() {

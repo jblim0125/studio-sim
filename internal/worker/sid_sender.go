@@ -69,7 +69,7 @@ func (sidSender *SIDSender) ReadDSLResponse(id int, resp models.HTTPData) error 
 	defer resp.Response.Body.Close()
 	switch resp.Response.StatusCode {
 	case http.StatusOK:
-		res := models.DSLResponseBody{}
+		res := models.ResponseBody{}
 		decoder := json.NewDecoder(resp.Response.Body)
 		err := decoder.Decode(&res)
 		if err != nil && err != io.EOF {
@@ -162,7 +162,7 @@ func (sidSender *SIDSender) ReadSidResponse(res *http.Response, sid string) erro
 	defer res.Body.Close()
 	switch res.StatusCode {
 	case http.StatusOK:
-		//result := models.DSLResponseBody{}
+		//result := models.ResponseBody{}
 		//decoder := json.NewDecoder(res.Body)
 		//err := decoder.Decode(&result)
 		//if err != nil && err != io.EOF {
