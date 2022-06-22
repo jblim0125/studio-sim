@@ -106,6 +106,22 @@ func (l *Logger) Shutdown() {
 	l.Errorf("%s", LINE90)
 }
 
+// SetLogLevelByString input string log level
+func (l *Logger) SetLogLevelByString(input string) {
+	switch strings.ToLower(input) {
+	case logrus.DebugLevel.String():
+		l.Logger.SetLevel(logrus.DebugLevel)
+	case logrus.InfoLevel.String():
+		l.Logger.SetLevel(logrus.InfoLevel)
+	case logrus.WarnLevel.String():
+		l.Logger.SetLevel(logrus.WarnLevel)
+	case "warn":
+		l.Logger.SetLevel(logrus.WarnLevel)
+	case logrus.ErrorLevel.String():
+		l.Logger.SetLevel(logrus.ErrorLevel)
+	}
+}
+
 // For test
 // testingWriter is an io.Writer that writes through t.Log.
 type testingWriter struct {

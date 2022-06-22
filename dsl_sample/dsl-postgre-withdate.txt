@@ -1,0 +1,1 @@
+model name = 'PT_SEOUL_AIR_2000_2009' model_owner = root start_date = 20220524183700 end_date = 20220524183831

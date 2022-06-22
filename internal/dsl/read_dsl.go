@@ -1,9 +1,11 @@
 package dsl
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 )
 
 // SampleDSL dsl.json 구조
@@ -23,4 +25,19 @@ func ReadSampleDSL(path string) (*map[string]interface{}, error) {
 		return nil, fmt.Errorf("fail unmarshal from file[ %s ]", err.Error())
 	}
 	return &sample.DSLs, nil
+}
+
+func ReadPlainDSL(path string) ([]string, error) {
+	var dsls []string
+	readFile, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	fileScanner := bufio.NewScanner(readFile)
+	fileScanner.Split(bufio.ScanLines)
+	for fileScanner.Scan() {
+		dsls = append(dsls, fileScanner.Text())
+	}
+	readFile.Close()
+	return dsls, nil
 }

@@ -1,0 +1,83 @@
+model name = 'gg' model_owner = root
+model name = 'gg_inci' model_owner = edu001
+model name = 'IMA_행정구역_읍면동' model_owner = root | geocode codetype=address  SI=`시도명` GU=`시군구명` DONG=`읍면동명` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=wkt op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((114.06005859375001 28.138494023859177,114.06005859375001 43.38094988675,142.43774414062503 43.38094988675,142.43774414062503 28.138494023859177,114.06005859375001 28.138494023859177)) | georelation intype=wkt op=Contains geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((126.830978 37.581045,126.909599 37.534777,126.926765 37.533143,126.943932 37.519529,126.982727 37.505641,127.026672 37.533688,127.066841 37.519257,127.083664 37.517351,127.120743 37.549749,127.160912 37.572066,127.196274 37.527698,127.120399 37.470226,127.035942 37.458508,126.927452 37.456601,126.907196 37.437521,126.87973 37.456055,126.87458 37.496108,126.825485 37.520619,126.803169 37.558459,126.830978 37.581045)) | geoconverter intype=wkt outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=*  keep=True
+model name = 'IMA_행정구역_읍면동' model_owner = root | geocode codetype=address  SI=`시도명` GU=`시군구명` DONG=`읍면동명` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=wkt op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((126.70377731323244 37.381251474242525,126.70377731323244 37.61482007592395,127.14717864990236 37.61482007592395,127.14717864990236 37.381251474242525,126.70377731323244 37.381251474242525)) | georelation intype=wkt op=Contains geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((126.830978 37.581045,126.909599 37.534777,126.926765 37.533143,126.943932 37.519529,126.982727 37.505641,127.026672 37.533688,127.066841 37.519257,127.083664 37.517351,127.120743 37.549749,127.160912 37.572066,127.196274 37.527698,127.120399 37.470226,127.035942 37.458508,126.927452 37.456601,126.907196 37.437521,126.87973 37.456055,126.87458 37.496108,126.825485 37.520619,126.803169 37.558459,126.830978 37.581045)) | geoconverter intype=wkt outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=*  keep=True
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '양평군' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |stats   sum(occur_cnt) as 사고발생건수,   sum(injpsn_cnt) as 부상자수,   sum(dprs_cnt) as 사망자수   by sum_yy |fields 사고발생건수, 부상자수, 사망자수, sum_yy |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '여주시' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '가평군' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '연천군' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | where ctp_kor_nm in ('경기도','인천광역시','서울특별시')
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | where ctp_kor_nm in ('경기도','인천광역시','서울특별시') | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=geometry op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((125.77657239995645 37.19776606789843,125.77657239995645 37.889924276220945,127.50666475047167 37.889924276220945,127.50666475047167 37.19776606789843,125.77657239995645 37.19776606789843)) | geoconverter intype=geometry outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=* ex_properties=old_geo keep=True
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | where ctp_kor_nm in ('경기도','인천광역시','서울특별시') | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | where ctp_kor_nm in ('경기도','인천광역시','서울특별시') | geocode codetype=address  SI=`ctp_kor_nm` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | where ctp_kor_nm in ('경기도','인천광역시','서울특별시') | geocode codetype=address  SI=`ctp_kor_nm` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=wkt op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((125.77657239995645 37.19776606789843,125.77657239995645 37.889924276220945,127.50666475047167 37.889924276220945,127.50666475047167 37.19776606789843,125.77657239995645 37.19776606789843)) | geoconverter intype=wkt outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=*  keep=True
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=geojson op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((125.77657239995645 37.19776606789843,125.77657239995645 37.889924276220945,127.50666475047167 37.889924276220945,127.50666475047167 37.19776606789843,125.77657239995645 37.19776606789843)) | geoconverter intype=geojson outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=* ex_properties=old_geo keep=True
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | geocode codetype=address  SI=`ctp_kor_nm` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=geojson op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((125.88478088378908 37.25197169179344,125.88478088378908 37.88059836427958,127.49977111816406 37.88059836427958,127.49977111816406 37.25197169179344,125.88478088378908 37.25197169179344)) | geoconverter intype=geojson outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=* ex_properties=old_geo keep=True
+model name = 'SIMPLE_PSQL_KOR_SIDO_8per' model_owner = root
+model name = 'PT_SEOUL_AIR_2000_2009' model_owner = root | top 1 -CTIME     | fields CTIME
+model name = '실거래_아파트별추세 (2)' model_owner = joylee
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '남양주시'
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '의정부시'
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '의정부시' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, dprs_cnt   as 사망자수, injpsn_cnt as 부상자수
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '양평군' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, dprs_cnt   as 사망자수, injpsn_cnt as 부상자수
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '양평군' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, dprs_cnt   as 사망자수, injpsn_cnt as 부상자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '여주시' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, dprs_cnt   as 사망자수, injpsn_cnt as 부상자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, dprs_cnt   as 사망자수, injpsn_cnt as 부상자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '가평군' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, dprs_cnt   as 사망자수, injpsn_cnt as 부상자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |stats   sum(occur_cnt) as 사고발생건수,   sum(dprs_cnt) as 사망자수,   sum(injpsn_cnt) as 부상자수   by sum_yy |fields 사고발생건수, 사망자수, 부상자수, sum_yy |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '파주시' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '화성시' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '수원시' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '용인시' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '광명시' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'gg' model_owner = root  | count
+model name = 'gg' model_owner = root | geocode codetype=address  SI=`sigun_nm` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'gg' model_owner = root | geocode codetype=address  SI=`` GU=`sigun_nm` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'gg' model_owner = root | where sigun_nm like '%' | count
+model name = 'gg' model_owner = root | where sigun_nm like '%'
+model name = 'gg' model_owner = root | where sigun_nm like '%시' | count
+model name = 'gg' model_owner = root | where sigun_nm like '%시'
+model name = 'gg' model_owner = root | concat '경기도', ' ' as 시도 | count
+model name = 'gg' model_owner = root | concat '경기도', ' ' as 시도
+model name = 'gg' model_owner = root | concat '경기도', ' '
+model name = 'gg' model_owner = root | concat '경기도', ' ' | count
+model name = 'gg' model_owner = root | concat "경기도", " "
+model name = 'gg' model_owner = root | concat "경기도", " " | count
+model name = 'gg' model_owner = root | concat "경기도", " " as 시도
+model name = 'gg' model_owner = root | concat "경기도", " " as 시도 | count
+model name = 'gg' model_owner = root | concat "경기도", " " as 시도 | geocode codetype=address  SI=`` GU=`sigun_nm` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'gg' model_owner = root | concat "경기도", " " as 시도 | geocode codetype=address  SI=`시도` GU=`sigun_nm` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'gg_inci' model_owner = edu001 |concat "경기도", "" as sido
+model name = 'gg_inci' model_owner = edu001  | count
+model name = 'SIMPLE_PSQL_KOR_SIG_10per' model_owner = root
+model name = 'SIMPLE_PSQL_KOR_SIG_10per' model_owner = root  | count
+model name = 'SIMPLE_PSQL_KOR_SIG_10per' model_owner = root | where sig_kor_nm  like '대전%'
+model name = 'SIMPLE_PSQL_KOR_SIG_10per' model_owner = root | where sig_kor_nm  like '대전%' | count
+model name = 'SIMPLE_PSQL_KOR_SIG_10per' model_owner = root |  distinct sig_kor_nm
+model name = 'SIMPLE_PSQL_KOR_SIG_10per' model_owner = root |  distinct sig_kor_nm | count
+model name = 'SIMPLE_PSQL_KOR_SIDO_8per' model_owner = root  | count
+model name = 'SIMPLE_PSQL_KOR_EMD_10per' model_owner = root  | count
+model name = 'SIMPLE_PSQL_KOR_EMD_10per' model_owner = root
+model name = 'SIMPLE_PSQL_KOR_LI_10per' model_owner = root  | count
+model name = 'SIMPLE_PSQL_KOR_LI_10per' model_owner = root
+model name = 'SIMPLE_PSQL_KOR_LI_10per' model_owner = root li_kor_nm='지내리'
+model name = 'SIMPLE_PSQL_KOR_LI_10per' model_owner = root li_kor_nm='지내리' | count
+model name = 'SIMPLE_PSQL_KOR_SIG_10per' model_owner = root sig_cd like '11%'
+model name = 'SIMPLE_PSQL_KOR_SIG_10per' model_owner = root | where sig_cd   like '11%'
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | distinct ctp_kor_nm, ctprvn_cd
+model name = 'SIMPLE_PSQL_KOR_SIG_10per' model_owner = root spatial_coordinates = 'POLYGON((38.762650338334154 124.70581054687501, 38.762650338334154 132.59399414062503, 32.90726224488304 132.59399414062503, 32.90726224488304 124.70581054687501, 38.762650338334154 124.70581054687501))' map_level = 7 |  where sig_cd   like '46%'
+model name = 'PT_SEOUL_AIR_2000_2009' model_owner = root
+model name = 'PT_SEOUL_AIR_2000_2009' model_owner = root  | count
+model name = 'modern_region_heritage' model_owner = sypark1452
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '안성시' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'SIMPLE_PSQL_KOR_SIG_25per' model_owner = root | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'SIMPLE_PSQL_KOR_SIG_25per' model_owner = root | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=geojson op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((124.49926757812501 35.96590463682109,124.49926757812501 37.75940350181066,129.75183105468753 37.75940350181066,129.75183105468753 35.96590463682109,124.49926757812501 35.96590463682109)) | geoconverter intype=geojson outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=* ex_properties=old_geo keep=True
+model name = 'SIMPLE_PSQL_KOR_SIG_25per' model_owner = root | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=geojson op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((121.87573242187501 35.06002702333654,121.87573242187501 38.6469781693404,132.38085937500003 38.6469781693404,132.38085937500003 35.06002702333654,121.87573242187501 35.06002702333654)) | geoconverter intype=geojson outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=* ex_properties=old_geo keep=True
+model name = 'SIMPLE_PSQL_KOR_SIG_25per' model_owner = root | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=geojson op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((116.62866210937501 33.23705506715222,116.62866210937501 40.40996526830533,137.63891601562503 40.40996526830533,137.63891601562503 33.23705506715222,116.62866210937501 33.23705506715222)) | geoconverter intype=geojson outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=* ex_properties=old_geo keep=True
+model name = 'SIMPLE_PSQL_KOR_SIG_10per' model_owner = root spatial_coordinates = 'POLYGON((38.762650338334154 124.70581054687501, 38.762650338334154 132.59399414062503, 32.90726224488304 132.59399414062503, 32.90726224488304 124.70581054687501, 38.762650338334154 124.70581054687501))' map_level = 7 |  where sig_cd   like '30%'
+model name = 'NB_IOT_CM_NB_APP_EQUIP_INFO' model_owner = kepco_iot | stats count(*)
+model name = 'NB_IOT_CM_NB_APP_INFO' model_owner = kepco_iot | join RIGHT_OUTER NB_IOT_CM_NB_APP_EQUIP_INFO NB_IOT_CM_NB_APP_EQUIP_INFO.ipv4_list = NB_IOT_CM_NB_APP_INFO.ipv4_list   | join LEFT_OUTER NB_IOT_FM_ALARM NB_IOT_CM_NB_APP_INFO .app_service_code = NB_IOT_FM_ALARM.app_service_code  | join LEFT_OUTER NB_IOT_TB_ANOMALY_OCCURE_STAT NB_IOT_CM_NB_APP_INFO.app_service_code = NB_IOT_TB_ANOMALY_OCCURE_STAT.app_service_code | where NB_IOT_CM_NB_APP_EQUIP_INFO_ipv4_list is not null | sql "select NB_IOT_CM_NB_APP_EQUIP_INFO_ipv4_list , case when NB_IOT_FM_ALARM_threshold_level <= 7 or NB_IOT_TB_ANOMALY_OCCURE_STAT_AD_LEVEL  <= 7  then 2 else 1 end as er from angora"  | stats max(er) as Err_Type by NB_IOT_CM_NB_APP_EQUIP_INFO_ipv4_list | stats count(*) as 'Server' by Err_Type | sql "SELECT CASE WHEN Err_Type = '2' then '장애' else '정상' end as Status, Server from angora"
