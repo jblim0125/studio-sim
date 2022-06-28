@@ -1,0 +1,58 @@
+model name = 'DM_1_1_1_GA_종별_구분별_집계' model_owner = kalis | where FACIL_GBN = 'TOTAL' | fields + FACIL_CNT, STD_YMD
+model name = 'DM_2_1_1_BA' model_owner = kalis | where 항목별 in ('건설사고 신고사유별(건)','사망사고 비율(%)','사망자수 비율(%)','월별 건설사고(건)','월별 사망사고(건)') | pivot sum(건수) splitcol 소재지_순서 splitrow 항목별_순서, 소항목별_순서, 항목별, 소항목별 sortcol asc sortrow asc | fields +항목별,소항목별,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 | fillna 1 0, 2 0, 3 0, 4 0, 5 0, 6 0, 7 0, 8 0, 9 0, 10 0, 11 0, 12 0, 13 0, 14 0, 15 0, 16 0, 17 0, 18 0 | rename 1 총계, 2 서울, 3 부산, 4 대구, 5 인천, 6 광주, 7 대전, 8 울산, 9 세종, 10 경기, 11 강원, 12 충북, 13 충남, 14 전북, 15 전남, 16 경북, 17 경남, 18 제주 | round 1 toString=True
+model name = 'KALIS_연도별_건축물에너지' model_owner = kalis | sort 2 -YEAR | sort YEAR | rename ARC_CNT `건축물 수(동)`, ENG_USE `1차 에너지 소비량(kwh/㎡)`, YEAR 연도
+model name = 'KALIS_이슈키워드분석_언급량분석' model_owner = dv2team | distinct searchword
+model name = 'KALIS_이슈키워드분석_언급량분석' model_owner = dv2team | where publishedat between '2022-01-15' and '2022-02-14' and searchword = '건설' | rename title 제목, description 본문, channel 채널
+model name = 'KALIS_점검진단부적정비율_연도별_평가별_집계 (2)' model_owner = kalis
+model name = 'KALIS_점검진단부적정비율_연도별_평가별_집계 (2)' model_owner = kalis  | count
+model name = 'KALIS_점검진단부적정비율_연도별_평가별_집계 (2)' model_owner = kalis | calculate FACIL_RATIO*100
+model name = 'KALIS_점검진단부적정비율_연도별_평가별_집계 (2)' model_owner = kalis | calculate FACIL_RATIO*100 as FACIL_RATIO | round 1 toString = True
+model name = 'KALIS_점검진단부적정비율_연도별_평가별_집계 (2)' model_owner = kalis | calculate FACIL_RATIO*100 as FACIL_RATIO | round 1 toString = True | count
+model name = 'KALIS_점검진단부적정비율_연도별_평가별_집계 (2)' model_owner = kalis | calculate FACIL_RATIO*100 as FACIL_RATIO | round 1 toString = True | where EVAL_KIND = '정밀안전진단'
+model name = 'KALIS_점검진단부적정비율_연도별_평가별_집계 (2)' model_owner = kalis | calculate FACIL_RATIO*100 as FACIL_RATIO | round 1 toString = True | where EVAL_KIND = '정밀안전진단' | count
+model name = 'KALIS_점검진단부적정비율_연도별_평가별_집계 (2)' model_owner = kalis | calculate FACIL_RATIO*100 | count
+model name = 'KALIS_점검진단부적정비율_연도별_평가별_집계 (2)' model_owner = kalis | calculate FACIL_RATIO*100 | round 1 toString = True
+model name = 'KALIS_점검진단부적정비율_연도별_평가별_집계 (2)' model_owner = kalis | calculate FACIL_RATIO*100 | round 1 toString = True | count
+model name = 'KALIS_점검진단업체현황_연도별_분야별_집계 (2)' model_owner = kalis
+model name = 'KALIS_점검진단업체현황_연도별_분야별_집계 (2)' model_owner = kalis  | count
+model name = 'KALIS_점검진단업체현황_연도별_분야별_집계 (2)' model_owner = kalis | calculate add all
+model name = 'KALIS_점검진단업체현황_연도별_분야별_집계 (2)' model_owner = kalis | calculate add all FACIL_CNT
+model name = 'KALIS_점검진단업체현황_연도별_분야별_집계 (2)' model_owner = kalis | calculate add all FACIL_CNT | count
+model name = 'KALIS_점검진단업체현황_연도별_분야별_집계 (2)' model_owner = kalis | calculate add all | count
+model name = 'KALIS_점검진단업체현황_연도별_분야별_집계 (2)' model_owner = kalis | calculate add row FACIL_CNT
+model name = 'KALIS_점검진단업체현황_연도별_분야별_집계 (2)' model_owner = kalis | calculate add row FACIL_CNT | count
+model name = 'KALIS_점검진단업체현황_연도별_분야별_집계 (2)' model_owner = kalis | pivot sum(FACIL_CNT) splitcol CORP_CD splitrow ENTRY_YEAR
+model name = 'KALIS_점검진단업체현황_연도별_분야별_집계 (2)' model_owner = kalis | sql "select * from angora"
+model name = 'KALIS_점검진단업체현황_연도별_분야별_집계 (2)' model_owner = kalis | sql "select * from angora" | count
+model name = 'TEST DATA 0524' | fields 버전 | distinct 버전
+model name = 'mo_국책과제' model_owner = mobigenms
+model name = 'mo_이월순매출' model_owner = mobigenms
+model name = 'mo_이월순매출' model_owner = mobigenms |  where CONT_CD = ''
+model name = 'mo_이월순매출' model_owner = mobigenms |  where CONT_CD = 'C2200013'
+model name = 'mo_인력사항' model_owner = mobigenms | where    그룹 = 'IOP개발그룹'     | rename Sum 근무개월 | fields -총괄,직책,직급,Sum  | case when 근무형태_1 = '외주'   then '900' when 근무형태_1 = '정직원'  then '001'  otherwise '기타'  as WORK_TY  |  calculate 경력등급 + 100  as  CAREER_TY  | typecast CAREER_TY integer  | merge left_outer ( mo_PCOD_WORK_UNITCOST  ENT_YEAR = '2022' ) as PWU  on  WORK_TY = PWU.WORK_TY and CAREER_TY = PWU.WORK_GUBUN    | calculate 근무개월 * PWU_WORK_UNITCOST as   연간비용  | typecast 연간비용 bigint  | fields 대상,EMP_CD as 직원코드,팀,근무형태_1,재직구분,경력등급,연간비용,근무개월,PWU_WORK_UNITCOST as 월비용,1월,2월,3월,4월,5월,6월,7월,8월,9월,10월,11월,12월  | sort  근무형태_1,  직원코드  | calculate add col  연간비용
+model name = '서울시버스정류장cosmos' model_owner = cosmos | top 10 정류장명 | concat "POINT(",X좌표," ",Y좌표, ")" as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'gg' model_owner = root
+model name = 'gg_inci' model_owner = edu001
+model name = 'IMA_행정구역_읍면동' model_owner = root | geocode codetype=address  SI=`시도명` GU=`시군구명` DONG=`읍면동명` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=wkt op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((114.06005859375001 28.138494023859177,114.06005859375001 43.38094988675,142.43774414062503 43.38094988675,142.43774414062503 28.138494023859177,114.06005859375001 28.138494023859177)) | georelation intype=wkt op=Contains geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((126.830978 37.581045,126.909599 37.534777,126.926765 37.533143,126.943932 37.519529,126.982727 37.505641,127.026672 37.533688,127.066841 37.519257,127.083664 37.517351,127.120743 37.549749,127.160912 37.572066,127.196274 37.527698,127.120399 37.470226,127.035942 37.458508,126.927452 37.456601,126.907196 37.437521,126.87973 37.456055,126.87458 37.496108,126.825485 37.520619,126.803169 37.558459,126.830978 37.581045)) | geoconverter intype=wkt outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=*  keep=True
+model name = 'IMA_행정구역_읍면동' model_owner = root | geocode codetype=address  SI=`시도명` GU=`시군구명` DONG=`읍면동명` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=wkt op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((126.70377731323244 37.381251474242525,126.70377731323244 37.61482007592395,127.14717864990236 37.61482007592395,127.14717864990236 37.381251474242525,126.70377731323244 37.381251474242525)) | georelation intype=wkt op=Contains geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((126.830978 37.581045,126.909599 37.534777,126.926765 37.533143,126.943932 37.519529,126.982727 37.505641,127.026672 37.533688,127.066841 37.519257,127.083664 37.517351,127.120743 37.549749,127.160912 37.572066,127.196274 37.527698,127.120399 37.470226,127.035942 37.458508,126.927452 37.456601,126.907196 37.437521,126.87973 37.456055,126.87458 37.496108,126.825485 37.520619,126.803169 37.558459,126.830978 37.581045)) | geoconverter intype=wkt outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=*  keep=True
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '양평군' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |stats   sum(occur_cnt) as 사고발생건수,   sum(injpsn_cnt) as 부상자수,   sum(dprs_cnt) as 사망자수   by sum_yy |fields 사고발생건수, 부상자수, 사망자수, sum_yy |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '여주시' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '가평군' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '연천군' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, injpsn_cnt as 부상자수, dprs_cnt   as 사망자수 |sort sum_yy
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | where ctp_kor_nm in ('경기도','인천광역시','서울특별시')
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | where ctp_kor_nm in ('경기도','인천광역시','서울특별시') | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=geometry op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((125.77657239995645 37.19776606789843,125.77657239995645 37.889924276220945,127.50666475047167 37.889924276220945,127.50666475047167 37.19776606789843,125.77657239995645 37.19776606789843)) | geoconverter intype=geometry outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=* ex_properties=old_geo keep=True
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | where ctp_kor_nm in ('경기도','인천광역시','서울특별시') | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | where ctp_kor_nm in ('경기도','인천광역시','서울특별시') | geocode codetype=address  SI=`ctp_kor_nm` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | where ctp_kor_nm in ('경기도','인천광역시','서울특별시') | geocode codetype=address  SI=`ctp_kor_nm` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=wkt op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((125.77657239995645 37.19776606789843,125.77657239995645 37.889924276220945,127.50666475047167 37.889924276220945,127.50666475047167 37.19776606789843,125.77657239995645 37.19776606789843)) | geoconverter intype=wkt outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=*  keep=True
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=geojson op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((125.77657239995645 37.19776606789843,125.77657239995645 37.889924276220945,127.50666475047167 37.889924276220945,127.50666475047167 37.19776606789843,125.77657239995645 37.19776606789843)) | geoconverter intype=geojson outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=* ex_properties=old_geo keep=True
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | geocode codetype=address  SI=`ctp_kor_nm` | rename GEOMETRY `공간 데이터셋 1_GEOMETRY` | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = 'SIMPLE_PSQL_KOR_SIDO_4per' model_owner = root | concat old_geo as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != '' | georelation intype=geojson op=Intersects geocol=`공간 데이터셋 1_GEOMETRY` filter=Polygon((125.88478088378908 37.25197169179344,125.88478088378908 37.88059836427958,127.49977111816406 37.88059836427958,127.49977111816406 37.25197169179344,125.88478088378908 37.25197169179344)) | geoconverter intype=geojson outtype=geojson geocol=`공간 데이터셋 1_GEOMETRY` properties=* ex_properties=old_geo keep=True
+model name = 'SIMPLE_PSQL_KOR_SIDO_8per' model_owner = root
+model name = 'PT_SEOUL_AIR_2000_2009' model_owner = root | top 1 -CTIME     | fields CTIME
+model name = '실거래_아파트별추세 (2)' model_owner = joylee
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '남양주시'
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '의정부시'
+model name = 'gg_inci' model_owner = edu001 |where sigun_nm = '의정부시' |fields sigun_nm as sigun_nm, sum_yy, occur_cnt as 사고발생건수, dprs_cnt   as 사망자수, injpsn_cnt as 부상자수

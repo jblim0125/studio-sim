@@ -1,0 +1,2 @@
+model name = 'EDU_SEOUL_GU_CENTER' model_owner = demo
+model name = 'EDU_SEOUL_GU_CENTER' model_owner = demo

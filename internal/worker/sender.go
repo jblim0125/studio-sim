@@ -128,7 +128,6 @@ func (sender *Sender) DSLLoop(id int) {
 		if sender.stop {
 			break
 		}
-
 	}
 	readFile.Close()
 }
@@ -245,11 +244,14 @@ func (sender *Sender) CrtDSLBody(dsl string) ([]byte, error) {
 	var plainBody models.DSLPlainRequest
 
 	if sender.conf.SendRule.Encrypt {
-		var q []string
-		// TODO : Enc
+		q, err := util.Encrypt(dsl)
+		if err != nil {
+			stat.SimStat{}.SendDSLErr()
+			return nil, err
+		}
 		encBody = models.DSLEncryptRequest{
 			Query:     q,
-			Encrypted: false,
+			Encrypted: true,
 		}
 		body, err = json.Marshal(encBody)
 		if err != nil {

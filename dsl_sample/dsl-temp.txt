@@ -1,0 +1,2 @@
+model name = '서울시버스정류장cosmos' model_owner = cosmos | top 10 정류장명 | concat "POINT(",X좌표," ",Y좌표, ")" as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != ''
+model name = '서울시버스정류장cosmos' model_owner = cosmos | top 10 정류장명 | concat "POINT(",X좌표," ",Y좌표, ")" as '공간 데이터셋 1_GEOMETRY' | where `공간 데이터셋 1_GEOMETRY` != ''
