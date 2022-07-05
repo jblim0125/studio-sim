@@ -1,0 +1,2 @@
+model name = 'mysql55-test' model_owner = root
+model name = 'mysql57-test' model_owner = root

@@ -1,0 +1,2 @@
+model name = 'JB-HDFS-TEST' model_owner = root
+model name = 'EPS_THING_MARIADB_NLP' model_owner = eps start_date = 20211001000000 end_date = 20211008174245 | where bidNtceKey = '2021100291101'  | fields term_value, term_count  | join LEFT_ANTI TERM_FREQUENCY_20 EPS_THING_MARIADB_NLP.term_value=TERM_FREQUENCY_20.TERM_FREQUENCY  | fields term_value, term_count  | sort 100 -term_count

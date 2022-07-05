@@ -1,0 +1,1 @@
+model name = 'EDU_IMA_서울시_행정구역별_대중교통승객수' model_owner = root | join EDU_IMA_서울시_동별_인구수 as B `읍면동` = B.동

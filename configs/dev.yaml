@@ -8,23 +8,22 @@ log:
   # compress: "compress(true/false)"
 server:
   # cache server info
-  #ip : "192.168.102.114"
-  ip : "localhost"
-#  ip : 192.168.202.65
-  #port : 32594
-  port : 8080
+#  ip : "192.168.102.114"
+#  port : 31472
+   ip : "localhost"
+   port : 8080
 sendRule:
   # 암호화된 DSL 전송
   encrypt: false
   # Thread 수 ( 한번에 전송하는 DSL의 수 )
-  numThread: 1
+  numThread: 10
   # Thread 동작 간격( DSL-1, DSL-2의 전송 간격, 단위 : ms )
   period: 1000
   # DSL 전송 수( 동일한 DSL을 설정된 수 만큼 전송 )
-  numSend: 1
+  numSend: 3
   # DSL 전송 간격( 동일한 DSL의 전송하는 간격, 단위 : ms )
-  periodDSL: 100
+  periodDSL: 10
   # 전체 DSL 전송 후 다시 시작
   infinite: false
   # 실행 중 DSL 수, 서버에 데이터를 요청하고 있는 상태의 수
-  runningDSL: 1
+  runningDSL: 10
